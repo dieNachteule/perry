@@ -10,12 +10,14 @@ public class GameManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     { 
-        Vector2 spawnPos = (Vector2)target.transform.position + Random.insideUnitCircle.normalized * spawnRadius;
-        GameObject hunter = Instantiate(hunterPrefab, spawnPos, Quaternion.identity);
+        for (int i = 0; i < numberOfHunters; i++) {
+            Vector2 spawnPos = (Vector2)target.transform.position + Random.insideUnitCircle.normalized * spawnRadius;
+            GameObject hunter = Instantiate(hunterPrefab, spawnPos, Quaternion.identity);
 
-        HunterChaser hc = hunter.GetComponent<HunterChaser>();
-        if (hc != null)
-            hc.target = target.transform;
+            HunterChaser hc = hunter.GetComponent<HunterChaser>();
+            if (hc != null)
+                hc.target = target.transform;
+        }
     }
 
     // Update is called once per frame
