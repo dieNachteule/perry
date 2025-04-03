@@ -24,16 +24,27 @@ public class GameManager : MonoBehaviour
     private Transform target;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    { 
-        for (int i = 0; i < numberOfHunters; i++) {
-            Vector2 spawnPos = (Vector2)target.transform.position + Random.insideUnitCircle.normalized * spawnRadius;
-            GameObject hunter = Instantiate(hunterPrefab, spawnPos, Quaternion.identity);
+    void Start() { 
+        GenerateBoundaryWalls();
+    }
 
-            HunterChaser hc = hunter.GetComponent<HunterChaser>();
-            if (hc != null)
-                hc.target = target.transform;
-        }
+    void GenerateBoundaryWalls() {
+        Vector2 center = Vector2.zero;
+        float thickness = 1f;
+
+        // Top
+        CreateWall(new Vector2(center.x, arenaHeight / 2 + thickness / 2), new Vector2(arenaWidth + thickness * 2, thickness));
+        // Bottom
+        CreateWall(new Vector2(center.x, -arenaHeight / 2 - thickness / 2), new Vector2(arenaWidth + thickness * 2, thickness));
+        // Left
+        CreateWall(new Vector2(-arenaWidth / 2 - thickness / 2, center.y), new Vector2(thickness, arenaHeight));
+        // Right
+        CreateWall(new Vector2(arenaWidth / 2 + thickness / 2, center.y), new Vector2(thickness, arenaHeight));
+    }
+
+    void CreateWall(Vector2 position, Vector2 scale) {
+        GameObject wall = Instantiate(wallPrefab, position, Quaternion.identity);
+        wall.transform.localScale = scale;
     }
 
     // Update is called once per frame
