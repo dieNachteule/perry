@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start() { 
         GenerateBoundaryWalls();
+        GenerateRandomWalls();
     }
 
     void GenerateBoundaryWalls() {
@@ -40,6 +41,30 @@ public class GameManager : MonoBehaviour
         CreateWall(new Vector2(-arenaWidth / 2 - thickness / 2, center.y), new Vector2(thickness, arenaHeight));
         // Right
         CreateWall(new Vector2(arenaWidth / 2 + thickness / 2, center.y), new Vector2(thickness, arenaHeight));
+    }
+
+    void GenerateRandomWalls() {
+        int wallCount = Random.Range(minWallCount, maxWallCount + 1);
+        for (int i = 0; i < wallCount; i++)
+        {
+            Vector2 size = new(
+                Random.Range(minWallSize.x, maxWallSize.x),
+                Random.Range(minWallSize.y, maxWallSize.y)
+            );
+
+            Vector2 position;
+            int attempts = 0;
+            do
+            {
+                position = new Vector2(
+                    Random.Range(-arenaWidth / 2 + size.x / 2, arenaWidth / 2 - size.x / 2),
+                    Random.Range(-arenaHeight / 2 + size.y / 2, arenaHeight / 2 - size.y / 2)
+                );
+                attempts++;
+            } while (target != null && Vector2.Distance(position, target.position) < minSpawnSeparation && attempts < 100);
+
+            CreateWall(position, size);
+        }
     }
 
     void CreateWall(Vector2 position, Vector2 scale) {
