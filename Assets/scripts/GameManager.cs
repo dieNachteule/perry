@@ -26,6 +26,8 @@ public class GameManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start() { 
         GenerateBoundaryWalls();
+        SpawnTarget();
+        SpawnHunters();
         GenerateRandomWalls();
     }
 
@@ -70,6 +72,33 @@ public class GameManager : MonoBehaviour
     void CreateWall(Vector2 position, Vector2 scale) {
         GameObject wall = Instantiate(wallPrefab, position, Quaternion.identity);
         wall.transform.localScale = scale;
+    }
+
+    void SpawnTarget()
+    {
+        Vector2 position = new(
+            Random.Range(-arenaWidth * 0.4f, -arenaWidth * 0.2f),
+            Random.Range(-arenaHeight * 0.4f, -arenaHeight * 0.2f)
+        );
+
+        GameObject targetObj = Instantiate(targetPrefab, position, Quaternion.identity);
+        target = targetObj.transform;
+    }
+
+    void SpawnHunters()
+    {
+        for (int i = 0; i < numberOfHunters; i++)
+        {
+            Vector2 position = new(
+                Random.Range(arenaWidth * 0.2f, arenaWidth * 0.4f),
+                Random.Range(arenaHeight * 0.2f, arenaHeight * 0.4f)
+            );
+
+            GameObject hunter = Instantiate(hunterPrefab, position, Quaternion.identity);
+            HunterChaser chaser = hunter.GetComponent<HunterChaser>();
+            if (chaser != null)
+                chaser.target = target;
+        }
     }
 
     // Update is called once per frame

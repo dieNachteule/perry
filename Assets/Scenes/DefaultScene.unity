@@ -300,7 +300,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a47e90c53617ed1a9109ea4ae22d75d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetPrefab: {fileID: 0}
+  targetPrefab: {fileID: 2537322609855893116, guid: 8ea842e6a3bc132f2bd069f1d3a1a407, type: 3}
   hunterPrefab: {fileID: 7778478541199718831, guid: 0270c611b842dd20facf10aef20b33a1, type: 3}
   wallPrefab: {fileID: 6426193312248866270, guid: 0f32257672610c4c8b99c4a7ff25822b, type: 3}
   arenaWidth: 20
