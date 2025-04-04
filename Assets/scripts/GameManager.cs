@@ -24,7 +24,11 @@ public class GameManager : MonoBehaviour
     private Transform target;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start() { 
+    void Start() {
+        Camera.main.orthographic = true;
+        Camera.main.orthographicSize = arenaHeight / 2f + 2f; // 2f for padding
+        Camera.main.transform.position = new Vector3(0, 0, -10);
+
         GenerateBoundaryWalls();
         SpawnTarget();
         SpawnHunters();
