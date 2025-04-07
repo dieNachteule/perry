@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 3983667450549170560}
   - component: {fileID: 8066281222622536252}
   - component: {fileID: 1097784259425539292}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Hunter
-  m_TagString: Untagged
+  m_TagString: Hunter
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -167,3 +167,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 0}
   speed: 3
+  viewDistance: 10
+  viewAngle: 80
