@@ -86,3 +86,26 @@ Exploring intelligent navigation techniques and pathfinding algorithms using Uni
 
 ---
 
+```mermaid
+stateDiagram-v2
+    [*] --> Patrol
+
+    Patrol --> Chase : Target in cone & visible
+    Chase --> Patrol : Lost sight of target
+
+    Patrol : Pick random target
+    Patrol : Move toward target
+    Patrol --> Patrol : Reached point\n→ pick new one
+    Patrol --> Patrol : Cone mostly blocked\n→ skip to new point
+
+    Chase : Move toward target
+    Chase : Check visibility
+
+    state Patrol {
+        [*] --> Moving
+        Moving --> Waiting : Reached target
+        Waiting --> Moving : Pause expired
+    }
+```
+
+---
