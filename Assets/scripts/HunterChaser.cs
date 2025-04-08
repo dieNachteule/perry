@@ -54,7 +54,7 @@ public class HunterChaser : MonoBehaviour
                 PatrolBehavior();
                 break;
             case State.Chase:
-                // ChaseBehavior();
+                ChaseBehavior();
                 break;
         }
 
@@ -96,6 +96,12 @@ public class HunterChaser : MonoBehaviour
             currentDirection = dir.normalized;
             transform.Translate(currentDirection * speed * Time.deltaTime);
         }
+    }
+
+    void ChaseBehavior() {
+        Vector2 dir = ((Vector2)target.position - (Vector2)transform.position);
+        currentDirection = dir.normalized;
+        transform.Translate(currentDirection * speed * Time.deltaTime);
     }
 
     void CheckLineOfSight() {
