@@ -58,21 +58,7 @@ public class HunterChaser : MonoBehaviour
                 break;
         }
 
-        // if (canSeeTarget) {
-        //     currentDirection = directionToTarget.normalized;
-        //     transform.Translate(currentDirection * speed * Time.deltaTime);
-        // } else {
-        //     float rotationSpeed = 90f;
-        //     float radians = rotationSpeed * Mathf.Deg2Rad * Time.deltaTime;
-        //     currentDirection = Quaternion.Euler(0, 0, radians * Mathf.Rad2Deg) * currentDirection;
-        // }
-
-        // Transform cone = transform.Find("VisionCone");
-        // if (cone != null)
-        // {
-        //     float angle = Mathf.Atan2(currentDirection.y, currentDirection.x) * Mathf.Rad2Deg;
-        //     cone.rotation = Quaternion.Euler(0, 0, angle);
-        // }
+        UpdateVisionConeRotation();
     }
 
     void PatrolBehavior() {
@@ -141,6 +127,22 @@ public class HunterChaser : MonoBehaviour
         for (int i = 0; i < patrolPointsCount; i++) {
             Vector2 point = center + Random.insideUnitCircle.normalized * patrolRadius;
             patrolPoints.Add(point);
+        }
+    }
+
+    void UpdateVisionConeRotation() {
+        Transform cone = transform.Find("VisionCone");
+        if (cone != null) {
+            float angle = Mathf.Atan2(currentDirection.y, currentDirection.x) * Mathf.Rad2Deg;
+            cone.rotation = Quaternion.Euler(0, 0, angle);
+        }
+    }
+
+    void OnDrawGizmosSelected() {
+        Gizmos.color = Color.yellow;
+        foreach (var pt in patrolPoints)
+        {
+            Gizmos.DrawSphere(pt, 0.2f);
         }
     }
 }
