@@ -1,10 +1,4 @@
-using System;
-using System.Collections.Concurrent;
-using System.Linq.Expressions;
-using System.Timers;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class HunterChaser : MonoBehaviour
 {
