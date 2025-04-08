@@ -64,6 +64,13 @@ public class HunterChaser : MonoBehaviour
             float radians = rotationSpeed * Mathf.Deg2Rad * Time.deltaTime;
             currentDirection = Quaternion.Euler(0, 0, radians * Mathf.Rad2Deg) * currentDirection;
         }
+
+        Transform cone = transform.Find("VisionCone");
+        if (cone != null)
+        {
+            float angle = Mathf.Atan2(currentDirection.y, currentDirection.x) * Mathf.Rad2Deg;
+            cone.rotation = Quaternion.Euler(0, 0, angle);
+        }
     }
 
     void OnDrawGizmosSelected()
