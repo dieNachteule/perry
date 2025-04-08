@@ -39,17 +39,41 @@ public class HunterChaser : MonoBehaviour
 
     // Update is called once per frame
     void Update() {
+        CheckLineOfSight();
+
+        
+
+        // if (canSeeTarget) {
+        //     currentDirection = directionToTarget.normalized;
+        //     transform.Translate(currentDirection * speed * Time.deltaTime);
+        // } else {
+        //     float rotationSpeed = 90f;
+        //     float radians = rotationSpeed * Mathf.Deg2Rad * Time.deltaTime;
+        //     currentDirection = Quaternion.Euler(0, 0, radians * Mathf.Rad2Deg) * currentDirection;
+        // }
+
+        // Transform cone = transform.Find("VisionCone");
+        // if (cone != null)
+        // {
+        //     float angle = Mathf.Atan2(currentDirection.y, currentDirection.x) * Mathf.Rad2Deg;
+        //     cone.rotation = Quaternion.Euler(0, 0, angle);
+        // }
+    }
+
+    void CheckLineOfSight()
+    {
+        canSeeTarget = false;
+
         if (target == null) return;
 
         Vector2 directionToTarget = (target.position - transform.position);
         float distance = directionToTarget.magnitude;
 
-        canSeeTarget = false;
-
-        if (distance < viewDistance) {
-            
+        if (distance < viewDistance)
+        {
             float angle = Vector2.Angle(currentDirection, directionToTarget.normalized);
-            if (angle < viewAngle / 2f) {
+            if (angle < viewAngle / 2f)
+            {
                 RaycastHit2D[] hits = new RaycastHit2D[5];
                 int count = Physics2D.Raycast(transform.position, directionToTarget.normalized, visionFilter, hits, viewDistance);
 
@@ -65,27 +89,10 @@ public class HunterChaser : MonoBehaviour
                     }
                     else if (hit.collider.CompareTag("Wall"))
                     {
-                        // Vision is blocked
                         break;
                     }
                 }
             }
-        }
-
-        if (canSeeTarget) {
-            currentDirection = directionToTarget.normalized;
-            transform.Translate(currentDirection * speed * Time.deltaTime);
-        } else {
-            float rotationSpeed = 90f;
-            float radians = rotationSpeed * Mathf.Deg2Rad * Time.deltaTime;
-            currentDirection = Quaternion.Euler(0, 0, radians * Mathf.Rad2Deg) * currentDirection;
-        }
-
-        Transform cone = transform.Find("VisionCone");
-        if (cone != null)
-        {
-            float angle = Mathf.Atan2(currentDirection.y, currentDirection.x) * Mathf.Rad2Deg;
-            cone.rotation = Quaternion.Euler(0, 0, angle);
         }
     }
 
