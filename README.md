@@ -2,10 +2,10 @@
 
 Exploring intelligent navigation techniques and pathfinding algorithms using Unity and AI frameworks.
 
-
 # 🧠 Hunter AI Strategy
 
 ## 🎯 Goals
+
 - Simulate natural hunter behavior with minimal scripting
 - Avoid rigid paths and maximize reactivity
 - Handle dynamic obstacles and tight terrain
@@ -16,6 +16,7 @@ Exploring intelligent navigation techniques and pathfinding algorithms using Uni
 ## 🤖 States
 
 ### 1. Patrol
+
 - Default state when target is not visible.
 - Hunter chooses a **new patrol point dynamically** after reaching the last one.
 - Patrol target is:
@@ -25,6 +26,7 @@ Exploring intelligent navigation techniques and pathfinding algorithms using Uni
 - If hunter becomes vision-cone blocked, it skips the current patrol target.
 
 ### 2. Chase
+
 - Activated when the target:
   - Is within vision distance
   - Lies within an 80° cone facing `currentDirection`
@@ -35,6 +37,7 @@ Exploring intelligent navigation techniques and pathfinding algorithms using Uni
 ---
 
 ## 👁️ Vision System
+
 - Hunter uses a cone-based field of view (FOV)
 - Detection conditions:
   - Target within `viewDistance`
@@ -48,6 +51,7 @@ Exploring intelligent navigation techniques and pathfinding algorithms using Uni
 ---
 
 ## 🧱 Cone Blockage Heuristic
+
 - Prevents hunters from staying stuck while facing a wall or dead-end
 - Logic:
   - Cast 5 rays spread across the cone
@@ -59,6 +63,7 @@ Exploring intelligent navigation techniques and pathfinding algorithms using Uni
 ---
 
 ## 🔧 Arena Integration
+
 - Arena bounds (`arenaWidth`, `arenaHeight`) are passed from `GameManager`
 - Hunters use these to:
   - Clamp patrol targets
@@ -67,6 +72,7 @@ Exploring intelligent navigation techniques and pathfinding algorithms using Uni
 ---
 
 ## 🧠 Design Notes
+
 - Patrol logic is randomized and light-weight
 - Behavior feels dynamic but predictable
 - Designed for extensibility with:
@@ -77,6 +83,7 @@ Exploring intelligent navigation techniques and pathfinding algorithms using Uni
 ---
 
 ## 📌 Future Ideas
+
 - Add pathfinding (A* or NavMesh) for obstacle-aware navigation
 - Implement a **Search state** after chase ends (last seen position)
 - Add an **Alert mode**: flashing cone, faster speed, aggressive pursuit
@@ -86,6 +93,8 @@ Exploring intelligent navigation techniques and pathfinding algorithms using Uni
 
 ---
 
+## 📊 Mermaid Diagram – AI State Logic
+
 ```mermaid
 stateDiagram-v2
     [*] --> Patrol
@@ -93,19 +102,21 @@ stateDiagram-v2
     Patrol --> Chase : Target in cone & visible
     Chase --> Patrol : Lost sight of target
 
-    Patrol : Pick random target
-    Patrol : Move toward target
-    Patrol --> Patrol : Reached point\n→ pick new one
-    Patrol --> Patrol : Cone mostly blocked\n→ skip to new point
+    Patrol --> Patrol : Reached point -pick new one
+    Patrol --> Patrol : Cone mostly blocked - skip to new point
 
-    Chase : Move toward target
-    Chase : Check visibility
+    state Chase {
+        [*] --> Pursuit
+        Pursuit --> Check_Visibility
+        Check_Visibility --> Pursuit
+    }
 
     state Patrol {
         [*] --> Moving
         Moving --> Waiting : Reached target
         Waiting --> Moving : Pause expired
     }
+
 ```
 
 ---
