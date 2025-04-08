@@ -41,7 +41,22 @@ public class HunterChaser : MonoBehaviour
     void Update() {
         CheckLineOfSight();
 
-        
+        if (canSeeTarget) {
+            currentState = State.Chase;
+        }
+        else if (currentState == State.Chase) {
+            // If we were chasing and lost sight, return to patrol
+            currentState = State.Patrol;
+        }
+
+        switch (currentState) {
+            case State.Patrol:
+                PatrolBehavior();
+                break;
+            case State.Chase:
+                // ChaseBehavior();
+                break;
+        }
 
         // if (canSeeTarget) {
         //     currentDirection = directionToTarget.normalized;
@@ -60,8 +75,30 @@ public class HunterChaser : MonoBehaviour
         // }
     }
 
-    void CheckLineOfSight()
-    {
+    void PatrolBehavior() {
+        if (patrolPoints.Count == 0) return;
+
+        Vector2 targetPos = patrolPoints[currentPatrolIndex];
+        Vector2 dir = (targetPos - (Vector2)transform.position);
+
+        if (dir.magnitude < waypointTolerance) {
+            // Arrived at point
+            if (pauseTimer <= 0f) {
+                pauseTimer = patrolPauseTime;
+            } else {
+                pauseTimer -= Time.deltaTime;
+                if (pauseTimer <= 0f) {
+                    currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Count;
+                }
+                return;
+            }
+        } else {
+            currentDirection = dir.normalized;
+            transform.Translate(currentDirection * speed * Time.deltaTime);
+        }
+    }
+
+    void CheckLineOfSight() {
         canSeeTarget = false;
 
         if (target == null) return;
@@ -69,26 +106,21 @@ public class HunterChaser : MonoBehaviour
         Vector2 directionToTarget = (target.position - transform.position);
         float distance = directionToTarget.magnitude;
 
-        if (distance < viewDistance)
-        {
+        if (distance < viewDistance) {
             float angle = Vector2.Angle(currentDirection, directionToTarget.normalized);
-            if (angle < viewAngle / 2f)
-            {
+            if (angle < viewAngle / 2f) {
                 RaycastHit2D[] hits = new RaycastHit2D[5];
                 int count = Physics2D.Raycast(transform.position, directionToTarget.normalized, visionFilter, hits, viewDistance);
 
-                for (int i = 0; i < count; i++)
-                {
+                for (int i = 0; i < count; i++) {
                     var hit = hits[i];
                     if (hit.collider == selfCollider) continue;
 
-                    if (hit.collider.CompareTag("Target"))
-                    {
+                    if (hit.collider.CompareTag("Target")) {
                         canSeeTarget = true;
                         break;
                     }
-                    else if (hit.collider.CompareTag("Wall"))
-                    {
+                    else if (hit.collider.CompareTag("Wall")) {
                         break;
                     }
                 }
@@ -96,13 +128,11 @@ public class HunterChaser : MonoBehaviour
         }
     }
 
-    void GeneratePatrolPoints()
-    {
+    void GeneratePatrolPoints() {
         patrolPoints.Clear();
         Vector2 center = transform.position;
 
-        for (int i = 0; i < patrolPointsCount; i++)
-        {
+        for (int i = 0; i < patrolPointsCount; i++) {
             Vector2 point = center + Random.insideUnitCircle.normalized * patrolRadius;
             patrolPoints.Add(point);
         }
