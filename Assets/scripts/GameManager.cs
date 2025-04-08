@@ -99,9 +99,12 @@ public class GameManager : MonoBehaviour
             );
 
             GameObject hunter = Instantiate(hunterPrefab, position, Quaternion.identity);
+
             HunterChaser chaser = hunter.GetComponent<HunterChaser>();
-            if (chaser != null)
+            if (chaser != null) {
                 chaser.target = target;
+                chaser.SetArenaBounds(arenaWidth, arenaHeight);
+            }
         }
     }
 

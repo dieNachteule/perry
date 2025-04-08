@@ -26,6 +26,13 @@ public class HunterChaser : MonoBehaviour
     private int currentPatrolIndex = 0;
     private float pauseTimer = 0f;
 
+    private float arenaWidth;
+    private float arenaHeight;
+
+    private float fovBlockCheckCooldown = 1f;
+    private float fovBlockTimer = 0f;
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start() {
         selfCollider = GetComponent<Collider2D>();
@@ -58,7 +65,20 @@ public class HunterChaser : MonoBehaviour
                 break;
         }
 
+        fovBlockTimer -= Time.deltaTime;
+
+        if (currentState == State.Patrol && fovBlockTimer <= 0f && IsConeBlocked())
+        {
+            fovBlockTimer = fovBlockCheckCooldown;
+            currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Count;
+        }
+
         UpdateVisionConeRotation();
+    }
+
+    public void SetArenaBounds(float width, float height) {
+        arenaWidth = width;
+        arenaHeight = height;
     }
 
     void PatrolBehavior() {
@@ -123,11 +143,44 @@ public class HunterChaser : MonoBehaviour
     void GeneratePatrolPoints() {
         patrolPoints.Clear();
         Vector2 center = transform.position;
+        int maxAttempts = 100;
 
         for (int i = 0; i < patrolPointsCount; i++) {
-            Vector2 point = center + Random.insideUnitCircle.normalized * patrolRadius;
+            int attempts = 0;
+            Vector2 point;
+
+            do {
+                point = center + Random.insideUnitCircle.normalized * patrolRadius;
+
+                // Clamp to arena bounds (adjust if your arena center is not 0,0)
+                point.x = Mathf.Clamp(point.x, -arenaWidth / 2f + 0.5f, arenaWidth / 2f - 0.5f);
+                point.y = Mathf.Clamp(point.y, -arenaHeight / 2f + 0.5f, arenaHeight / 2f - 0.5f);
+
+                attempts++;
+            }
+            while (Physics2D.OverlapCircle(point, 0.3f, LayerMask.GetMask("VisionBlocker")) != null && attempts < maxAttempts);
+
             patrolPoints.Add(point);
         }
+    }
+
+    bool IsConeBlocked() {
+        int raysToCast = 5;
+        int hits = 0;
+        float halfAngle = viewAngle / 2f;
+
+        for (int i = 0; i <= raysToCast; i++) {
+            float angle = -halfAngle + (viewAngle / raysToCast) * i;
+            Vector2 dir = Quaternion.Euler(0, 0, angle) * currentDirection;
+
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, viewDistance, LayerMask.GetMask("VisionBlocker"));
+            if (hit.collider != null) {
+                hits++;
+            }
+        }
+
+        float blockedRatio = hits / (float)(raysToCast + 1);
+        return blockedRatio >= 0.9f;
     }
 
     void UpdateVisionConeRotation() {
