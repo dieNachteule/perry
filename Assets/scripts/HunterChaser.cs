@@ -158,20 +158,29 @@ public class HunterChaser : MonoBehaviour
     bool IsConeBlocked() {
         int raysToCast = 5;
         int hits = 0;
+        float maxUnblockedDistance = 0f;
+        float minPenetrationDepth = viewDistance * 0.5f;
         float halfAngle = viewAngle / 2f;
 
-        for (int i = 0; i <= raysToCast; i++) {
+        for (int i = 0; i <= raysToCast; i++)
+        {
             float angle = -halfAngle + (viewAngle / raysToCast) * i;
             Vector2 dir = Quaternion.Euler(0, 0, angle) * currentDirection;
 
             RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, viewDistance, LayerMask.GetMask("VisionBlocker"));
-            if (hit.collider != null) {
+            if (hit.collider != null)
+            {
                 hits++;
+                maxUnblockedDistance = Mathf.Max(maxUnblockedDistance, hit.distance);
+            }
+            else
+            {
+                maxUnblockedDistance = Mathf.Max(maxUnblockedDistance, viewDistance);
             }
         }
 
         float blockedRatio = hits / (float)(raysToCast + 1);
-        return blockedRatio >= 0.9f;
+        return blockedRatio >= 0.9f && maxUnblockedDistance < minPenetrationDepth;
     }
 
     void UpdateVisionConeRotation() {
