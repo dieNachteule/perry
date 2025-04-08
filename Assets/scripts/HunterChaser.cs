@@ -1,16 +1,30 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class HunterChaser : MonoBehaviour
 {
+    public enum State { Patrol, Chase }
+    private State currentState = State.Patrol;
+
     public Transform target;
     public float speed = 3f;
     public float viewDistance = 10f;
     public float viewAngle = 80f;
 
+    public float waypointTolerance = 0.2f;
+    public float patrolPauseTime = 1f;
+    public int patrolPointsCount = 3;
+    public float patrolRadius = 5f;
+
     private bool canSeeTarget = false;
     private Vector2 currentDirection = Vector2.right;
+
     private ContactFilter2D visionFilter;
     private Collider2D selfCollider;
+
+    private List<Vector2> patrolPoints = new();
+    private int currentPatrolIndex = 0;
+    private float pauseTimer = 0f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start() {
@@ -19,6 +33,8 @@ public class HunterChaser : MonoBehaviour
         visionFilter = new ContactFilter2D();
         visionFilter.SetLayerMask(LayerMask.GetMask("Entities", "VisionBlocker"));
         visionFilter.useTriggers = false;
+
+        GeneratePatrolPoints();
     }
 
     // Update is called once per frame
@@ -73,15 +89,15 @@ public class HunterChaser : MonoBehaviour
         }
     }
 
-    void OnDrawGizmosSelected()
+    void GeneratePatrolPoints()
     {
-        Gizmos.color = canSeeTarget ? Color.green : Color.red;
+        patrolPoints.Clear();
+        Vector2 center = transform.position;
 
-        Vector3 leftDir = Quaternion.Euler(0, 0, -viewAngle / 2) * currentDirection;
-        Vector3 rightDir = Quaternion.Euler(0, 0, viewAngle / 2) * currentDirection;
-
-        Gizmos.DrawLine(transform.position, transform.position + leftDir * viewDistance);
-        Gizmos.DrawLine(transform.position, transform.position + rightDir * viewDistance);
-        Gizmos.DrawWireSphere(transform.position, viewDistance);
+        for (int i = 0; i < patrolPointsCount; i++)
+        {
+            Vector2 point = center + Random.insideUnitCircle.normalized * patrolRadius;
+            patrolPoints.Add(point);
+        }
     }
 }
