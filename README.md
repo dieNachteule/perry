@@ -54,7 +54,7 @@ Exploring intelligent navigation techniques and pathfinding algorithms using Uni
 
 - Prevents hunters from staying stuck while facing a wall or dead-end
 - Logic:
-  - Cast 5 rays spread across the cone
+  - Cast 10 rays spread across the cone
   - Count number of rays blocked by obstacles
   - Measure **furthest unblocked distance** among them
 - If **≥90% of rays are blocked** and none reach beyond **50% of view distance**, the cone is considered blocked

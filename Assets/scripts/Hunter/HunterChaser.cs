@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class HunterChaser : MonoBehaviour
+public partial class HunterChaser : MonoBehaviour
 {
     public enum State { Patrol, Chase }
     private State currentState = State.Patrol;
@@ -30,12 +30,8 @@ public class HunterChaser : MonoBehaviour
     private float fovBlockCheckCooldown = 1f;
     private float fovBlockTimer = 0f;
 
-    private List<Vector2> debugRayDirections = new List<Vector2>();
-    private List<float> debugRayDistances = new List<float>();
-
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start() {
+    void Start()
+    {
         selfCollider = GetComponent<Collider2D>();
 
         visionFilter = new ContactFilter2D();
@@ -43,21 +39,24 @@ public class HunterChaser : MonoBehaviour
         visionFilter.useTriggers = false;
 
         PickNewPatrolTarget();
+        InitDebug();
     }
 
-    // Update is called once per frame
-    void Update() {
+    void Update()
+    {
         CheckLineOfSight();
 
-        if (canSeeTarget) {
+        if (canSeeTarget)
+        {
             currentState = State.Chase;
         }
-        else if (currentState == State.Chase) {
-            // If we were chasing and lost sight, return to patrol
+        else if (currentState == State.Chase)
+        {
             currentState = State.Patrol;
         }
 
-        switch (currentState) {
+        switch (currentState)
+        {
             case State.Patrol:
                 PatrolBehavior();
                 break;
@@ -77,12 +76,14 @@ public class HunterChaser : MonoBehaviour
         UpdateVisionConeRotation();
     }
 
-    public void SetArenaBounds(float width, float height) {
+    public void SetArenaBounds(float width, float height)
+    {
         arenaWidth = width;
         arenaHeight = height;
     }
 
-    void CheckLineOfSight() {
+    void CheckLineOfSight()
+    {
         canSeeTarget = false;
 
         if (target == null) return;
@@ -90,21 +91,26 @@ public class HunterChaser : MonoBehaviour
         Vector2 directionToTarget = (target.position - transform.position);
         float distance = directionToTarget.magnitude;
 
-        if (distance < viewDistance) {
+        if (distance < viewDistance)
+        {
             float angle = Vector2.Angle(currentDirection, directionToTarget.normalized);
-            if (angle < viewAngle / 2f) {
+            if (angle < viewAngle / 2f)
+            {
                 RaycastHit2D[] hits = new RaycastHit2D[5];
                 int count = Physics2D.Raycast(transform.position, directionToTarget.normalized, visionFilter, hits, viewDistance);
 
-                for (int i = 0; i < count; i++) {
+                for (int i = 0; i < count; i++)
+                {
                     var hit = hits[i];
                     if (hit.collider == selfCollider) continue;
 
-                    if (hit.collider.CompareTag("Target")) {
+                    if (hit.collider.CompareTag("Target"))
+                    {
                         canSeeTarget = true;
                         break;
                     }
-                    else if (hit.collider.CompareTag("Wall")) {
+                    else if (hit.collider.CompareTag("Wall"))
+                    {
                         break;
                     }
                 }
@@ -112,39 +118,49 @@ public class HunterChaser : MonoBehaviour
         }
     }
 
-    void PatrolBehavior() {
+    void PatrolBehavior()
+    {
         Vector2 dir = (currentPatrolTarget - (Vector2)transform.position);
 
-        if (dir.magnitude < waypointTolerance) {
-            // Arrived at point
-            if (pauseTimer <= 0f) {
+        if (dir.magnitude < waypointTolerance)
+        {
+            if (pauseTimer <= 0f)
+            {
                 pauseTimer = patrolPauseTime;
-            } else {
-                 pauseTimer -= Time.deltaTime;
-                if (pauseTimer <= 0f) {
+            }
+            else
+            {
+                pauseTimer -= Time.deltaTime;
+                if (pauseTimer <= 0f)
+                {
                     PickNewPatrolTarget();
                 }
                 return;
             }
-        } else {
+        }
+        else
+        {
             currentDirection = dir.normalized;
             transform.Translate(currentDirection * speed * Time.deltaTime);
         }
     }
 
-    void ChaseBehavior() {
+    void ChaseBehavior()
+    {
         Vector2 dir = ((Vector2)target.position - (Vector2)transform.position);
         currentDirection = dir.normalized;
         transform.Translate(currentDirection * speed * Time.deltaTime);
     }
 
-    void PickNewPatrolTarget() {
+    void PickNewPatrolTarget()
+    {
         int maxAttempts = 100;
         Vector2 center = transform.position;
         Vector2 point = center;
         int attempts = 0;
 
-        do {
+        do
+        {
             point = center + Random.insideUnitCircle.normalized * patrolRadius;
             point.x = Mathf.Clamp(point.x, -arenaWidth / 2f + 0.5f, arenaWidth / 2f - 0.5f);
             point.y = Mathf.Clamp(point.y, -arenaHeight / 2f + 0.5f, arenaHeight / 2f - 0.5f);
@@ -158,15 +174,16 @@ public class HunterChaser : MonoBehaviour
         currentPatrolTarget = point;
     }
 
-    bool IsConeBlocked() {
+    bool IsConeBlocked()
+    {
         int raysToCast = 10;
         int hits = 0;
         float maxUnblockedDistance = 0f;
         float minPenetrationDepth = viewDistance * 0.5f;
         float halfAngle = viewAngle / 2f;
 
-        debugRayDirections.Clear();
-        debugRayDistances.Clear();
+        var debugRayDirections = new List<Vector2>();
+        var debugRayDistances = new List<float>();
 
         for (int i = 0; i <= raysToCast; i++)
         {
@@ -179,39 +196,29 @@ public class HunterChaser : MonoBehaviour
             if (hit.collider != null)
             {
                 hits++;
-                debugRayDistances.Add(hit.distance);
                 maxUnblockedDistance = Mathf.Max(maxUnblockedDistance, hit.distance);
+                debugRayDistances.Add(hit.distance);
             }
             else
             {
-                debugRayDistances.Add(viewDistance);
                 maxUnblockedDistance = Mathf.Max(maxUnblockedDistance, viewDistance);
+                debugRayDistances.Add(viewDistance);
             }
         }
+
+        PushDebugRaycastData(debugRayDirections, debugRayDistances);
 
         float blockedRatio = hits / (float)(raysToCast + 1);
         return blockedRatio >= 0.9f && maxUnblockedDistance < minPenetrationDepth;
     }
 
-    void UpdateVisionConeRotation() {
+    void UpdateVisionConeRotation()
+    {
         Transform cone = transform.Find("VisionCone");
-        if (cone != null) {
+        if (cone != null)
+        {
             float angle = Mathf.Atan2(currentDirection.y, currentDirection.x) * Mathf.Rad2Deg;
             cone.rotation = Quaternion.Euler(0, 0, angle);
-        }
-    }
-
-    void OnDrawGizmosSelected() {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawSphere(currentPatrolTarget, 0.2f);
-
-        Gizmos.color = Color.red;
-        for (int i = 0; i < debugRayDirections.Count; i++) {
-            Vector2 start = transform.position;
-            Vector2 dir = debugRayDirections[i];
-            float distance = debugRayDistances[i];
-
-            Gizmos.DrawLine(start, start + dir.normalized * distance);
         }
     }
 }
