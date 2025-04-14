@@ -21,5 +21,8 @@ public partial class HunterChaser : MonoBehaviour
     {
         hunterDebugger?.SetRaycastDebug(directions, distances, transform.position);
     }
+
+    public Vector2 GetCurrentPatrolTarget() => currentPatrolTarget;
+    public State GetCurrentState() => currentState;
 }
 #endif
