@@ -30,6 +30,9 @@ public class HunterChaser : MonoBehaviour
     private float fovBlockCheckCooldown = 1f;
     private float fovBlockTimer = 0f;
 
+    private List<Vector2> debugRayDirections = new List<Vector2>();
+    private List<float> debugRayDistances = new List<float>();
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start() {
@@ -156,11 +159,14 @@ public class HunterChaser : MonoBehaviour
     }
 
     bool IsConeBlocked() {
-        int raysToCast = 5;
+        int raysToCast = 10;
         int hits = 0;
         float maxUnblockedDistance = 0f;
         float minPenetrationDepth = viewDistance * 0.5f;
         float halfAngle = viewAngle / 2f;
+
+        debugRayDirections.Clear();
+        debugRayDistances.Clear();
 
         for (int i = 0; i <= raysToCast; i++)
         {
@@ -168,13 +174,17 @@ public class HunterChaser : MonoBehaviour
             Vector2 dir = Quaternion.Euler(0, 0, angle) * currentDirection;
 
             RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, viewDistance, LayerMask.GetMask("VisionBlocker"));
+            debugRayDirections.Add(dir);
+
             if (hit.collider != null)
             {
                 hits++;
+                debugRayDistances.Add(hit.distance);
                 maxUnblockedDistance = Mathf.Max(maxUnblockedDistance, hit.distance);
             }
             else
             {
+                debugRayDistances.Add(viewDistance);
                 maxUnblockedDistance = Mathf.Max(maxUnblockedDistance, viewDistance);
             }
         }
@@ -194,5 +204,14 @@ public class HunterChaser : MonoBehaviour
     void OnDrawGizmosSelected() {
         Gizmos.color = Color.yellow;
         Gizmos.DrawSphere(currentPatrolTarget, 0.2f);
+
+        Gizmos.color = Color.red;
+        for (int i = 0; i < debugRayDirections.Count; i++) {
+            Vector2 start = transform.position;
+            Vector2 dir = debugRayDirections[i];
+            float distance = debugRayDistances[i];
+
+            Gizmos.DrawLine(start, start + dir.normalized * distance);
+        }
     }
 }
