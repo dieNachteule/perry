@@ -3,7 +3,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     [Header("Prefabs")]
-    public GameObject targetPrefab;
+    public GameObject playerPrefab;
     public GameObject hunterPrefab;
     public GameObject wallPrefab;
 
@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviour
     public int numberOfHunters = 3;
     public float minSpawnSeparation = 5f;
 
-    private Transform target;
+    private Transform player;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start() {
@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour
         Camera.main.transform.position = new Vector3(0, 0, -10);
 
         GenerateBoundaryWalls();
-        SpawnTarget();
+        SpawnPlayer();
         SpawnHunters();
         GenerateRandomWalls();
     }
@@ -67,7 +67,7 @@ public class GameManager : MonoBehaviour
                     Random.Range(-arenaHeight / 2 + size.y / 2, arenaHeight / 2 - size.y / 2)
                 );
                 attempts++;
-            } while (target != null && Vector2.Distance(position, target.position) < minSpawnSeparation && attempts < 100);
+            } while (player != null && Vector2.Distance(position, player.position) < minSpawnSeparation && attempts < 100);
 
             CreateWall(position, size);
         }
@@ -78,15 +78,15 @@ public class GameManager : MonoBehaviour
         wall.transform.localScale = scale;
     }
 
-    void SpawnTarget()
+    void SpawnPlayer()
     {
         Vector2 position = new(
             Random.Range(-arenaWidth * 0.4f, -arenaWidth * 0.2f),
             Random.Range(-arenaHeight * 0.4f, -arenaHeight * 0.2f)
         );
 
-        GameObject targetObj = Instantiate(targetPrefab, position, Quaternion.identity);
-        target = targetObj.transform;
+        GameObject targetObj = Instantiate(playerPrefab, position, Quaternion.identity);
+        player = targetObj.transform;
     }
 
     void SpawnHunters()
@@ -102,7 +102,7 @@ public class GameManager : MonoBehaviour
 
             HunterChaser chaser = hunter.GetComponent<HunterChaser>();
             if (chaser != null) {
-                chaser.target = target;
+                chaser.player = player;
                 chaser.SetArenaBounds(arenaWidth, arenaHeight);
             }
         }

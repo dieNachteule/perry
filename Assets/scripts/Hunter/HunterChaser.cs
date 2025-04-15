@@ -6,7 +6,7 @@ public partial class HunterChaser : MonoBehaviour
     public enum State { Patrol, Chase }
     private State currentState = State.Patrol;
 
-    public Transform target;
+    public Transform player;
     public float speed = 3f;
     public float viewDistance = 10f;
     public float viewAngle = 80f;
@@ -86,9 +86,9 @@ public partial class HunterChaser : MonoBehaviour
     {
         canSeeTarget = false;
 
-        if (target == null) return;
+        if (player == null) return;
 
-        Vector2 directionToTarget = (target.position - transform.position);
+        Vector2 directionToTarget = (player.position - transform.position);
         float distance = directionToTarget.magnitude;
 
         if (distance < viewDistance)
@@ -147,7 +147,7 @@ public partial class HunterChaser : MonoBehaviour
 
     void ChaseBehavior()
     {
-        Vector2 dir = ((Vector2)target.position - (Vector2)transform.position);
+        Vector2 dir = ((Vector2)player.position - (Vector2)transform.position);
         currentDirection = dir.normalized;
         transform.Translate(currentDirection * speed * Time.deltaTime);
     }
