@@ -15,6 +15,7 @@ public abstract class EntityDebugVisualizer : MonoBehaviour
 
     public void SetRaycastDebug(List<Vector2> dirs, List<float> dists, Vector2 start)
     {
+        Debug.Log($"SetRaycastDebug called: {dirs.Count} rays");
         directions.Clear();
         distances.Clear();
         origin = start;

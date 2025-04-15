@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public partial class HunterChaser : MonoBehaviour
 {
-    private EntityDebugVisualizer hunterDebugger;
+    private HunterDebugVisualizer hunterDebugger;
 
     void OnDrawGizmosSelected()
     {
@@ -14,11 +14,15 @@ public partial class HunterChaser : MonoBehaviour
 
     void InitDebug()
     {
-        hunterDebugger = GetComponent<EntityDebugVisualizer>();
+        hunterDebugger = GetComponent<HunterDebugVisualizer>();
     }
 
     void PushDebugRaycastData(List<Vector2> directions, List<float> distances)
     {
+        if (!hunterDebugger) {
+            Debug.Log("hunterDebugger is null");
+        }
+        
         hunterDebugger?.SetRaycastDebug(directions, distances, transform.position);
     }
 

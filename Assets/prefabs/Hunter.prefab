@@ -116,6 +116,7 @@ GameObject:
   - component: {fileID: 3983667450549170560}
   - component: {fileID: 8066281222622536252}
   - component: {fileID: 1097784259425539292}
+  - component: {fileID: 3519472880790709642}
   m_Layer: 7
   m_Name: Hunter
   m_TagString: Hunter
@@ -276,3 +277,22 @@ MonoBehaviour:
   waypointTolerance: 0.2
   patrolPauseTime: 1
   patrolRadius: 5
+--- !u!114 &3519472880790709642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7778478541199718831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38beef7e390e4d579a93c146e241a271, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  debugEnabled: 1
+  rayColor: {r: 0, g: 1, b: 0, a: 1}
+  patrolPathColor: {r: 0, g: 1, b: 1, a: 1}
+  idleColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  chaseColor: {r: 1, g: 0, b: 0, a: 1}
+  showPatrolPath: 1
+  showStateLabel: 1
